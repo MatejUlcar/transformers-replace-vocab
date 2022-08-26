@@ -14,7 +14,7 @@ parser.add_argument('-o', '--output', help='where to save the newly adapted mode
 parser.add_argument('-d', '--dictionary', default='dict.txt', help='path to the new vocabulary/dictionary file')
 args = parser.parse_args()
 
-og_model = args.model #'ai4bharat/indic-bert'
+og_model = args.model
 t = AutoTokenizer.from_pretrained(og_model)
 m = AutoModel.from_pretrained(og_model)
 m.eval()
