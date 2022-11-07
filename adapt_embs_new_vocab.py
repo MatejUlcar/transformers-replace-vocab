@@ -13,6 +13,7 @@ parser.add_argument('-m', '--model', default='.', help='huggingface ID or path t
 parser.add_argument('-o', '--output', help='where to save the newly adapted model')
 parser.add_argument('-d', '--dictionary', default='dict.txt', help='path to the new vocabulary/dictionary file')
 parser.add_argument('-s', '--skip', default=3, help='how many initial lines to skip in dict.txt')
+parser.add_argument('-p', '--skip-embs', default=4, type=int, help='how many initial tokens to skip in original embs, e.g. skip eos, bos, unk, pad, mask tokens')
 args = parser.parse_args()
 
 og_model = args.model
@@ -41,11 +42,11 @@ for i,x in enumerate(newvocab):
 
 
 # set new embs to the model
-m.resize_token_embeddings(len(newvocab)+5) # allow for +5 specials: eos,bos,unk,pad,mask
+m.resize_token_embeddings(len(newvocab)+args.skip_embs+1) # allow for +5 specials: eos,bos,unk,pad,mask
 with torch.no_grad():
     for i in range(len(new_e)):
         vocab_index = i+args.skip # first (0) element in new_e is 0+3=fourth element in dict.txt
-        embed_index = vocab_index+4 # starts with 4 special tokens (eos,bos,pad,unk)
+        embed_index = vocab_index+args.skip_embs # starts with 4 special tokens (eos,bos,pad,unk)
     m.state_dict()['embeddings.word_embeddings.weight'][embed_index] = torch.tensor(new_e[i])
     
 
